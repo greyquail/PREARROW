@@ -29,9 +29,9 @@ let score = 0;
 let gameRunning = true;
 
 let playerSpeed = 0;
-const maxSpeed = 7; // Increased speed for more responsive movement
-const acceleration = 1.5;
-const friction = 0.9;
+const maxSpeed = 8; // Further increased speed for responsiveness
+const acceleration = 2;
+const friction = 0.85; // Reduced friction for smoother movement
 
 function drawPlayer() {
     ctx.drawImage(playerImage, playerX, playerY, playerWidth, playerHeight);
@@ -47,7 +47,7 @@ function drawEnemy(enemy) {
 
 function moveArrows() {
     for (let i = 0; i < arrows.length; i++) {
-        arrows[i].y -= 7; // Increased arrow speed for faster gameplay
+        arrows[i].y -= 8; // Faster arrow speed
         if (arrows[i].y < 0) {
             arrows.splice(i, 1);
         }
@@ -56,7 +56,7 @@ function moveArrows() {
 
 function moveEnemies() {
     for (let i = 0; i < enemies.length; i++) {
-        enemies[i].y += 3; // Slightly faster enemies for more challenge
+        enemies[i].y += 3; // Keep enemy speed slightly challenging
         if (enemies[i].y > canvas.height) {
             gameRunning = false;
             alert(`Game Over! Your Score: ${score}`);
@@ -96,9 +96,9 @@ function drawScore() {
 
 function updatePlayerPosition() {
     playerX += playerSpeed;
-    playerSpeed *= friction; // Apply friction for smoother stop
+    playerSpeed *= friction; // Apply friction for smooth stopping
 
-    // Keep player within the canvas
+    // Keep player within the canvas bounds
     if (playerX < 0) playerX = 0;
     if (playerX > canvas.width - playerWidth) playerX = canvas.width - playerWidth;
 }
@@ -115,9 +115,13 @@ function draw() {
     detectCollisions();
     drawScore();
 
-    updatePlayerPosition(); // Update player position with smoother movement
+    updatePlayerPosition(); // Smooth movement update
 
     requestAnimationFrame(draw);
+}
+
+function shootArrow() {
+    arrows.push({ x: playerX + playerWidth / 2 - arrowWidth / 2, y: playerY });
 }
 
 document.addEventListener('keydown', function(e) {
@@ -126,7 +130,7 @@ document.addEventListener('keydown', function(e) {
     } else if (e.key === 'ArrowRight') {
         playerSpeed = Math.min(playerSpeed + acceleration, maxSpeed); // Accelerate right
     } else if (e.key === ' ') {
-        arrows.push({ x: playerX + playerWidth / 2 - arrowWidth / 2, y: playerY });
+        shootArrow(); // Shoot arrow when space is pressed
     }
 });
 
@@ -140,7 +144,7 @@ canvas.addEventListener('touchstart', function(e) {
 });
 
 canvas.addEventListener('touchend', function() {
-    arrows.push({ x: playerX + playerWidth / 2 - arrowWidth / 2, y: playerY });
+    shootArrow(); // Shoot arrow on touch release
 });
 
 setInterval(generateEnemy, 1000);
