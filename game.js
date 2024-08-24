@@ -56,7 +56,7 @@ function moveArrows() {
 
 function moveEnemies() {
     for (let i = 0; i < enemies.length; i++) {
-        enemies[i].y += 2.5; // Slower enemy speed for longer gameplay
+        enemies[i].y += 1.5; // Slower enemy speed for longer gameplay
         if (enemies[i].y > canvas.height) {
             gameRunning = false;
             alert(`Game Over! Your Score: ${score}`);
@@ -147,5 +147,5 @@ canvas.addEventListener('touchend', function() {
     shootArrow(); // Shoot arrow on touch release
 });
 
-setInterval(generateEnemy, 1500); // Slower enemy generation for longer gameplay
+setInterval(generateEnemy, 2000); // Slower enemy generation for longer gameplay
 draw();
