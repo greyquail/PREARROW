@@ -4,10 +4,21 @@ const ctx = canvas.getContext('2d');
 canvas.width = canvas.clientWidth;
 canvas.height = canvas.clientHeight;
 
-const arrowWidth = 5;
-const arrowHeight = 15;
-const playerWidth = 30;
-const playerHeight = 30;
+const playerWidth = 60;
+const playerHeight = 60;
+const arrowWidth = 10;
+const arrowHeight = 30;
+const enemyWidth = 60;
+const enemyHeight = 60;
+
+const playerImage = new Image();
+playerImage.src = 'player.png'; // Image of the player
+
+const enemyImage = new Image();
+enemyImage.src = 'enemy.png'; // Image of the enemy
+
+const arrowImage = new Image();
+arrowImage.src = 'arrow.png'; // Image of the arrow
 
 let playerX = canvas.width / 2 - playerWidth / 2;
 const playerY = canvas.height - playerHeight - 10;
@@ -18,18 +29,15 @@ let score = 0;
 let gameRunning = true;
 
 function drawPlayer() {
-    ctx.fillStyle = "#00ff00";
-    ctx.fillRect(playerX, playerY, playerWidth, playerHeight);
+    ctx.drawImage(playerImage, playerX, playerY, playerWidth, playerHeight);
 }
 
 function drawArrow(arrow) {
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(arrow.x, arrow.y, arrowWidth, arrowHeight);
+    ctx.drawImage(arrowImage, arrow.x, arrow.y, arrowWidth, arrowHeight);
 }
 
 function drawEnemy(enemy) {
-    ctx.fillStyle = "#ff0000";
-    ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+    ctx.drawImage(enemyImage, enemy.x, enemy.y, enemyWidth, enemyHeight);
 }
 
 function moveArrows() {
@@ -56,9 +64,9 @@ function detectCollisions() {
     for (let i = 0; i < enemies.length; i++) {
         for (let j = 0; j < arrows.length; j++) {
             if (
-                arrows[j].x < enemies[i].x + enemies[i].width &&
+                arrows[j].x < enemies[i].x + enemyWidth &&
                 arrows[j].x + arrowWidth > enemies[i].x &&
-                arrows[j].y < enemies[i].y + enemies[i].height &&
+                arrows[j].y < enemies[i].y + enemyHeight &&
                 arrows[j].y + arrowHeight > enemies[i].y
             ) {
                 enemies.splice(i, 1);
@@ -71,16 +79,14 @@ function detectCollisions() {
 }
 
 function generateEnemy() {
-    const enemyWidth = 30;
-    const enemyHeight = 30;
     const randomX = Math.floor(Math.random() * (canvas.width - enemyWidth));
-    enemies.push({ x: randomX, y: 0, width: enemyWidth, height: enemyHeight });
+    enemies.push({ x: randomX, y: 0 });
 }
 
 function drawScore() {
-    ctx.font = "16px Arial";
+    ctx.font = "20px Arial";
     ctx.fillStyle = "#fff";
-    ctx.fillText("Score: " + score, 8, 20);
+    ctx.fillText("Score: " + score, 10, 30);
 }
 
 function draw() {
@@ -103,7 +109,7 @@ document.addEventListener('keydown', function(e) {
         playerX -= 10;
     } else if (e.key === 'ArrowRight' && playerX < canvas.width - playerWidth) {
         playerX += 10;
-    } else if (e.key === 'Space') {
+    } else if (e.key === ' ') {
         arrows.push({ x: playerX + playerWidth / 2 - arrowWidth / 2, y: playerY });
     }
 });
@@ -117,7 +123,7 @@ canvas.addEventListener('touchstart', function(e) {
     }
 });
 
-canvas.addEventListener('touchend', function(e) {
+canvas.addEventListener('touchend', function() {
     arrows.push({ x: playerX + playerWidth / 2 - arrowWidth / 2, y: playerY });
 });
 
