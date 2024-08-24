@@ -29,9 +29,9 @@ let score = 0;
 let gameRunning = true;
 
 let playerSpeed = 0;
-const maxSpeed = 8; // Further increased speed for responsiveness
+const maxSpeed = 8; // Keeps movement responsive
 const acceleration = 2;
-const friction = 0.85; // Reduced friction for smoother movement
+const friction = 0.85; // Smooth stopping
 
 function drawPlayer() {
     ctx.drawImage(playerImage, playerX, playerY, playerWidth, playerHeight);
@@ -47,7 +47,7 @@ function drawEnemy(enemy) {
 
 function moveArrows() {
     for (let i = 0; i < arrows.length; i++) {
-        arrows[i].y -= 8; // Faster arrow speed
+        arrows[i].y -= 8; // Arrows move fast
         if (arrows[i].y < 0) {
             arrows.splice(i, 1);
         }
@@ -56,7 +56,7 @@ function moveArrows() {
 
 function moveEnemies() {
     for (let i = 0; i < enemies.length; i++) {
-        enemies[i].y += 3; // Keep enemy speed slightly challenging
+        enemies[i].y += 2.5; // Slower enemy speed for longer gameplay
         if (enemies[i].y > canvas.height) {
             gameRunning = false;
             alert(`Game Over! Your Score: ${score}`);
@@ -96,7 +96,7 @@ function drawScore() {
 
 function updatePlayerPosition() {
     playerX += playerSpeed;
-    playerSpeed *= friction; // Apply friction for smooth stopping
+    playerSpeed *= friction; // Smooth deceleration
 
     // Keep player within the canvas bounds
     if (playerX < 0) playerX = 0;
@@ -147,5 +147,5 @@ canvas.addEventListener('touchend', function() {
     shootArrow(); // Shoot arrow on touch release
 });
 
-setInterval(generateEnemy, 1000);
+setInterval(generateEnemy, 1500); // Slower enemy generation for longer gameplay
 draw();
