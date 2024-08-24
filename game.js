@@ -1,0 +1,125 @@
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+canvas.width = canvas.clientWidth;
+canvas.height = canvas.clientHeight;
+
+const arrowWidth = 5;
+const arrowHeight = 15;
+const playerWidth = 30;
+const playerHeight = 30;
+
+let playerX = canvas.width / 2 - playerWidth / 2;
+const playerY = canvas.height - playerHeight - 10;
+
+let arrows = [];
+let enemies = [];
+let score = 0;
+let gameRunning = true;
+
+function drawPlayer() {
+    ctx.fillStyle = "#00ff00";
+    ctx.fillRect(playerX, playerY, playerWidth, playerHeight);
+}
+
+function drawArrow(arrow) {
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(arrow.x, arrow.y, arrowWidth, arrowHeight);
+}
+
+function drawEnemy(enemy) {
+    ctx.fillStyle = "#ff0000";
+    ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+}
+
+function moveArrows() {
+    for (let i = 0; i < arrows.length; i++) {
+        arrows[i].y -= 5;
+        if (arrows[i].y < 0) {
+            arrows.splice(i, 1);
+        }
+    }
+}
+
+function moveEnemies() {
+    for (let i = 0; i < enemies.length; i++) {
+        enemies[i].y += 2;
+        if (enemies[i].y > canvas.height) {
+            gameRunning = false;
+            alert(`Game Over! Your Score: ${score}`);
+            document.location.reload();
+        }
+    }
+}
+
+function detectCollisions() {
+    for (let i = 0; i < enemies.length; i++) {
+        for (let j = 0; j < arrows.length; j++) {
+            if (
+                arrows[j].x < enemies[i].x + enemies[i].width &&
+                arrows[j].x + arrowWidth > enemies[i].x &&
+                arrows[j].y < enemies[i].y + enemies[i].height &&
+                arrows[j].y + arrowHeight > enemies[i].y
+            ) {
+                enemies.splice(i, 1);
+                arrows.splice(j, 1);
+                score += 10;
+                return;
+            }
+        }
+    }
+}
+
+function generateEnemy() {
+    const enemyWidth = 30;
+    const enemyHeight = 30;
+    const randomX = Math.floor(Math.random() * (canvas.width - enemyWidth));
+    enemies.push({ x: randomX, y: 0, width: enemyWidth, height: enemyHeight });
+}
+
+function drawScore() {
+    ctx.font = "16px Arial";
+    ctx.fillStyle = "#fff";
+    ctx.fillText("Score: " + score, 8, 20);
+}
+
+function draw() {
+    if (!gameRunning) return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawPlayer();
+    moveArrows();
+    arrows.forEach(drawArrow);
+    moveEnemies();
+    enemies.forEach(drawEnemy);
+    detectCollisions();
+    drawScore();
+
+    requestAnimationFrame(draw);
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowLeft' && playerX > 0) {
+        playerX -= 10;
+    } else if (e.key === 'ArrowRight' && playerX < canvas.width - playerWidth) {
+        playerX += 10;
+    } else if (e.key === 'Space') {
+        arrows.push({ x: playerX + playerWidth / 2 - arrowWidth / 2, y: playerY });
+    }
+});
+
+canvas.addEventListener('touchstart', function(e) {
+    const touchX = e.touches[0].clientX;
+    if (touchX < canvas.width / 2 && playerX > 0) {
+        playerX -= 10;
+    } else if (touchX > canvas.width / 2 && playerX < canvas.width - playerWidth) {
+        playerX += 10;
+    }
+});
+
+canvas.addEventListener('touchend', function(e) {
+    arrows.push({ x: playerX + playerWidth / 2 - arrowWidth / 2, y: playerY });
+});
+
+setInterval(generateEnemy, 1000);
+draw();
