@@ -28,6 +28,11 @@ let enemies = [];
 let score = 0;
 let gameRunning = true;
 
+let playerSpeed = 0;
+const maxSpeed = 7; // Increased speed for more responsive movement
+const acceleration = 1.5;
+const friction = 0.9;
+
 function drawPlayer() {
     ctx.drawImage(playerImage, playerX, playerY, playerWidth, playerHeight);
 }
@@ -42,7 +47,7 @@ function drawEnemy(enemy) {
 
 function moveArrows() {
     for (let i = 0; i < arrows.length; i++) {
-        arrows[i].y -= 5;
+        arrows[i].y -= 7; // Increased arrow speed for faster gameplay
         if (arrows[i].y < 0) {
             arrows.splice(i, 1);
         }
@@ -51,7 +56,7 @@ function moveArrows() {
 
 function moveEnemies() {
     for (let i = 0; i < enemies.length; i++) {
-        enemies[i].y += 2;
+        enemies[i].y += 3; // Slightly faster enemies for more challenge
         if (enemies[i].y > canvas.height) {
             gameRunning = false;
             alert(`Game Over! Your Score: ${score}`);
@@ -89,6 +94,15 @@ function drawScore() {
     ctx.fillText("Score: " + score, 10, 30);
 }
 
+function updatePlayerPosition() {
+    playerX += playerSpeed;
+    playerSpeed *= friction; // Apply friction for smoother stop
+
+    // Keep player within the canvas
+    if (playerX < 0) playerX = 0;
+    if (playerX > canvas.width - playerWidth) playerX = canvas.width - playerWidth;
+}
+
 function draw() {
     if (!gameRunning) return;
 
@@ -101,14 +115,16 @@ function draw() {
     detectCollisions();
     drawScore();
 
+    updatePlayerPosition(); // Update player position with smoother movement
+
     requestAnimationFrame(draw);
 }
 
 document.addEventListener('keydown', function(e) {
-    if (e.key === 'ArrowLeft' && playerX > 0) {
-        playerX -= 10;
-    } else if (e.key === 'ArrowRight' && playerX < canvas.width - playerWidth) {
-        playerX += 10;
+    if (e.key === 'ArrowLeft') {
+        playerSpeed = Math.max(playerSpeed - acceleration, -maxSpeed); // Accelerate left
+    } else if (e.key === 'ArrowRight') {
+        playerSpeed = Math.min(playerSpeed + acceleration, maxSpeed); // Accelerate right
     } else if (e.key === ' ') {
         arrows.push({ x: playerX + playerWidth / 2 - arrowWidth / 2, y: playerY });
     }
@@ -116,10 +132,10 @@ document.addEventListener('keydown', function(e) {
 
 canvas.addEventListener('touchstart', function(e) {
     const touchX = e.touches[0].clientX;
-    if (touchX < canvas.width / 2 && playerX > 0) {
-        playerX -= 10;
-    } else if (touchX > canvas.width / 2 && playerX < canvas.width - playerWidth) {
-        playerX += 10;
+    if (touchX < canvas.width / 2) {
+        playerSpeed = Math.max(playerSpeed - acceleration, -maxSpeed); // Move left
+    } else {
+        playerSpeed = Math.min(playerSpeed + acceleration, maxSpeed); // Move right
     }
 });
 
